@@ -290,8 +290,18 @@ app.get("/scan", async function(req,res){
   }
 });
 
+
+// ─── KEEP ALIVE (prevents Render free tier sleeping during scan) ──────────────
+// Pings self every 10 minutes to stay warm
+const SELF_URL = process.env.RENDER_EXTERNAL_URL || "http://localhost:" + (process.env.PORT || 3000);
+setInterval(function() {
+  https.get(SELF_URL + "/", function(res) {
+    console.log("[keep-alive] ping " + new Date().toLocaleTimeString());
+  }).on("error", function() {});
+}, 10 * 60 * 1000); // every 10 minutes
+
 // ─── START ────────────────────────────────────────────────────────────────────
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, "0.0.0.0", function() {
   console.log("==========================================");
   console.log("  SwingScanner v4 — US + UK + Asia");
